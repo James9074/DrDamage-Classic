@@ -1,0 +1,86 @@
+- Read the website and look at Known Issues before filing a ticket.
+- And do NOT file a ticket on Alpha builds unless we explicitly ask
+- for it.  Thanks.  We know it's not ready yet! You've been warned!
+-
+
+- 5.4 DK changes
+- Adjusted necrotic strike down to 100% weapon damage (was 150%)
+- Increased Razorice up to 3% (was 2%)
+- Increased Frost Strike to 115% of weapon damage (was 105%)
+- Increased Howling Blast by 15% (down from 30% in previous PTR)
+- Increased Might of the Frozen Wastes to 30% (was 20%)
+- Increased Obliterate to 250% weapon damage (was 230%)
+- Increased Unholy Might to 25% (was 10%)
+- Added damage modifier buff for Death Siphon
+
+- 5.4 Druid Changes
+- Increased Wrath by 10%
+- Increased Starfall by 10%
+- Increased Starfire by 10%
+- Increased Dream of Cenarius to 30% for kitty.  (was 25%)
+- Decreased Dream of Cenarius to 25% for boomkins. (was 30%)
+- Increased Nature's Vigil to 12% (was 10%)
+
+- 5.4 Hunter Changes
+- Arcane shot increased to 125% weapon damage. (was 100%)
+- Aimed Shot increased to 450% weapon damage. (was 350%)
+- Explosive Shot Increased by 30%
+- Explosive Trap decreased by 30%
+
+- 5.4 Mage Changes
+- Disabled frostbolt stacking buff (no longer applies) to frost spells.
+- Increased Ice Lance 43%
+- Increased PvP damage of Frost Bomb to 70% (was 60%)
+- Increased PvP damage of Living Bomb to 85% (was 70%)
+- Increased PvP damage of Nether Tempest to 85% (was 70%)
+- New frost mage mastery not yet implemented - is currently inaccurate except for elemental pet.
+
+- 5.4 Rogue Changes
+- Decreased damage of Eviscerate by 10%
+- Increased Dispatch to 645% of weapon damage (up from 460%)
+- Increased Mutilate to 280% weapon damage (up from 200%)
+- Increased Revealing Strike to 160% weapon damage (up from 125%)
+- Increased Vitality to 140% AP (up from 140%)
+- Increased Backstab to 380% weapon damage (up from 275%)
+- Increased Hemorrhage to 160% weapon damage (up from 140%)
+- Increased Sanguinary Vein to 125% damage (was 120%)
+- Increased Sinister Strike to 240% weapon damage (was 145%)
+
+- 5.4 Priest Changes
+- Increased Shadow Word: Death by 15%
+- Increased Shadow Word: Pain by 25%
+- Increased Vampiric Touch by 20%
+
+- 5.4 Shaman Changes
+- Set chain heal's chain factor to no longer decrease in effectiveness per jump
+- Reduced Healing Rain's effectiveness by 30%
+- Added conditional for purification to increase Healing Rain by 100%
+- Increased aoe targets for Healing Rain from 5 to 12
+- Increased Fire Nova damage by 83% for enhancement
+- Decreased damage of Stormstrike to 380% weapon damage (was 450%)
+- Added Elemental blast to Stormstrike crit modifier
+- New talent: Rushing Streams not yet implemented.
+
+- 5.4 Warlock Changes
+- Increased Corruption damage by 10%
+- Increased Fel Flame damage by 13%
+- Increased Immolate damage by 10%
+- Increased Unstable Affliction by 21%
+- Reduced Drain Soul damage by 34%
+- Increased damage bonus of Haunt buff to 45% (was 30%)
+- Increased Haunt damage 50%
+- Decreased Malefic Grasp damage by 34%
+- Removed Drain Soul/Life from Grimoire of Sacrifice
+- Reduced damage bonus of Grimoire of Sacrifice for Affliction to 20% (was 30%)
+- New passive: Harvest Life not yet implemented
+
+- 5.4 Warrior changes
+- Made Blood and Thunder affect all specs (was just prot warriors)
+- Increased the damage of Blood and Thunder by 65% to 247.5% weapon damage (was 150%)
+- Added logic to change weapon damage of Bladestorm for arms and prot
+
+- 5.4 Paladin changes
+- Disabled Divine Plea debuff - no longer reduces healing taken by 50%
+- Added logic for Holy Insight modifying certain spells by 25% and others by 50%
+
+
