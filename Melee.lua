@@ -36,7 +36,6 @@ local GetItemInfo = GetItemInfo
 local GetInventoryItemLink = GetInventoryItemLink
 local GetComboPoints = GetComboPoints
 local GetExpertise = GetExpertise
-local GetMastery = GetMastery
 local GetHitModifier = GetHitModifier
 local GetSpellBonusDamage = GetSpellBonusDamage
 local GetSpellCritChance = GetSpellCritChance
@@ -115,7 +114,6 @@ function DrDamage:Melee_CheckBaseStats()
 	+ UnitRangedDamage("player")
 	+ select(2,UnitRangedDamage("player"))
 	+ GetExpertise()
-	+ GetMasteryEffect()
 
 	if newValues ~= oldValues then
 		oldValues = newValues
@@ -424,7 +422,6 @@ function DrDamage:MeleeCalc( name, rank, tooltip, modify, debug )
 	calculation.actionCost = select(4,GetSpellInfo(baseSpell.SpellCost or spellID or name)) or 0
 	calculation.baseCost = calculation.actionCost
 	calculation.powerType = select(6,GetSpellInfo(spellID or name)) or 4
-	calculation.mastery, calculation.masteryM = GetMasteryEffect()
 	calculation.spec = GetSpecialization()
 	--@debug@
 	calculation.spec = debug or GetSpecialization()
@@ -577,7 +574,6 @@ function DrDamage:MeleeCalc( name, rank, tooltip, modify, debug )
 			calculation.hasteRating = 0 --calculation.hasteRating - GetCombatRating(calculation.ranged and 19 or 18)
 			calculation.critPerc = calculation.critPerc - GetCombatRatingBonus((baseSpell.SpellCrit and 11 or 9))
 			calculation.hitPerc = calculation.hitPerc - GetCombatRatingBonus((baseSpell.SpellHit and 8 or 6))
-			calculation.mastery = GetMasteryEffect() - calculation.masteryM * GetCombatRatingBonus(26)
 		end
 		calculation.expertise = math_max(0, calculation.expertise + self:GetRating("Expertise", settings.ExpertiseRating, true))
 		calculation.expertise_O = math_max(0, (calculation.expertise_O or 0) + self:GetRating("Expertise", settings.ExpertiseRating, true))
@@ -587,7 +583,6 @@ function DrDamage:MeleeCalc( name, rank, tooltip, modify, debug )
 		calculation.meleeHit = calculation.spellHit
 		calculation.spellCrit = self:GetRating("Crit", settings.CritRating, true)
 		calculation.meleeCrit = calculation.meleeCrit
-		calculation.mastery = math_max(0, calculation.mastery + calculation.masteryM * self:GetRating("Mastery", settings.MasteryRating, true))
 	end
 
 	calculation.minDam = spell[1]
@@ -687,12 +682,6 @@ function DrDamage:MeleeCalc( name, rank, tooltip, modify, debug )
 		end
 	end
 
-	--CORE: Mastery only available above level 80
-	calculation.mastery = (playerLevel >= 80) and calculation.mastery or 0
-	--@debug@
-	calculation.mastery = debug and 8 or (playerLevel >= 80) and calculation.mastery or 0
-	--@end-debug@
-
 	--ADD CLASS SPECIFIC MODS
 	if Calculation[playerClass] then
 		Calculation[playerClass]( calculation, ActiveAuras, Talents, spell, baseSpell )
@@ -752,7 +741,7 @@ function DrDamage:MeleeCalc( name, rank, tooltip, modify, debug )
 	local avgTotal = DrD_DmgCalc( baseSpell, spell, false, false, tooltip )
 
 	if tooltip and not calculation.zero and not baseSpell.NoNext then
-		if settings.Next or settings.CompareStats or settings.CompareStr or settings.CompareAgi or settings.CompareInt or settings.CompareAP or settings.CompareMastery or settings.CompareCrit or settings.CompareHit or settings.CompareExp then
+		if settings.Next or settings.CompareStats or settings.CompareStr or settings.CompareAgi or settings.CompareInt or settings.CompareAP or settings.CompareCrit or settings.CompareHit or settings.CompareExp then
 			local avgTotal = DrD_DmgCalc( baseSpell, spell, true )
 			CalculationResults.Stats = avgTotal
 			if calculation.APBonus > 0 or calculation.WeaponDamage then
@@ -772,12 +761,6 @@ function DrDamage:MeleeCalc( name, rank, tooltip, modify, debug )
 				calculation.str = calculation.str + 10
 				CalculationResults.NextStr = DrD_DmgCalc( baseSpell, spell, true ) - avgTotal
 				calculation.str = calculation.str - 10
-			end
-			if calculation.playerLevel >= 80 then
-				calculation.mastery = calculation.mastery + 1
-				CalculationResults.NextMastery = DrD_DmgCalc( baseSpell, spell, true ) - avgTotal
-				CalculationResults.MasteryM = calculation.masteryM
-				calculation.mastery = calculation.mastery - 1
 			end
 			if not baseSpell.Unresistable then
 				if calculation.dodge or calculation.parry then
@@ -1632,7 +1615,6 @@ function DrDamage:MeleeTooltip( frame, name, rank )
 		local agiA = CalculationResults.NextAgi and CalculationResults.NextAgi > 0 and CalculationResults.Stats * 0.1 / CalculationResults.NextAgi
 		local intA = CalculationResults.NextInt and CalculationResults.NextInt > 0 and CalculationResults.Stats * 0.1 / CalculationResults.NextInt
 		local apA = CalculationResults.NextAP and CalculationResults.NextAP > 0 and CalculationResults.Stats * 0.1 / CalculationResults.NextAP
-		local masA = CalculationResults.NextMastery and CalculationResults.NextMastery > 0 and CalculationResults.Stats * 0.01 / CalculationResults.NextMastery * self:GetRating("Mastery", nil, true ) * (1 / CalculationResults.MasteryM)
 		local critA = CalculationResults.NextCrit and CalculationResults.NextCrit > 0 and CalculationResults.Stats * 0.01 / CalculationResults.NextCrit * self:GetRating("Crit", nil, true)
 		local expA = CalculationResults.NextExp and CalculationResults.NextExp > 0 and CalculationResults.Stats * 0.01 / CalculationResults.NextExp * self:GetRating("Expertise",nil,true)
 		local hitA = CalculationResults.NextHit and CalculationResults.NextHit > 0 and CalculationResults.Stats * 0.01 / CalculationResults.NextHit * self:GetRating("Hit", nil, true)
@@ -1642,7 +1624,6 @@ function DrDamage:MeleeTooltip( frame, name, rank )
 			if agiA then frame:AddDoubleLine("+10 " .. L["Agi"] .. ":", "+" .. DrD_Round(CalculationResults.NextAgi, 2), rt, gt, bt, r, g, b) end
 			if intA then frame:AddDoubleLine("+10 " .. L["Int"] .. ":", "+" .. DrD_Round(CalculationResults.NextInt, 2), rt, gt, bt, r, g, b) end
 			if apA then frame:AddDoubleLine("+10 " .. bType .. ":", "+" .. DrD_Round(CalculationResults.NextAP, 2), rt, gt, bt, r, g, b ) end
-			if masA then frame:AddDoubleLine("+1 " .. L["Mastery"] .. " (" .. DrD_Round(self:GetRating("Mastery", nil, true) * (1 / CalculationResults.MasteryM),2) .. "):", "+" .. DrD_Round(CalculationResults.NextMastery, 2), rt, gt, bt, r, g, b ) end
 			if expA then frame:AddDoubleLine("+1 " .. L["Expertise"] .. " (" .. self:GetRating("Expertise") .. "):", "+" .. DrD_Round(CalculationResults.NextExp, 2), rt, gt, bt, r, g, b ) end
 			if critA then frame:AddDoubleLine("+1% " .. L["Crit"] .. " (" .. self:GetRating("Crit") .. "):", "+" .. DrD_Round(CalculationResults.NextCrit, 2), rt, gt, bt, r, g, b ) end
 			if hitA then frame:AddDoubleLine("+1% " .. L["Hit"] .. " (" .. self:GetRating("Hit") .. "):", "+" .. DrD_Round(CalculationResults.NextHit, 2), rt, gt, bt, r, g, b ) end
@@ -1710,10 +1691,6 @@ function DrDamage:MeleeTooltip( frame, name, rank )
 		end
 		if settings.CompareAP and apA then
 			local text, value = self:CompareTooltip(apA, strA, agiA, intA, masA, critA, hitA, expA, bType, L["Str"], L["Agi"], L["Int"], L["Ma"], L["Cr"], L["Ht"], L["Exp"])
-			if text then frame:AddDoubleLine(text, value, rt, gt, bt, r, g, b ) end
-		end
-		if settings.CompareMastery and masA then
-			local text, value = self:CompareTooltip(masA, strA, agiA, intA, apA, critA, hitA, expA, L["Ma"], L["Str"], L["Agi"], L["Int"], bType, L["Cr"], L["Ht"], L["Exp"])
 			if text then frame:AddDoubleLine(text, value, rt, gt, bt, r, g, b ) end
 		end
 		if settings.CompareCrit and critA then

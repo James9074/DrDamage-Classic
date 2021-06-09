@@ -64,10 +64,8 @@ local GetItemGem = GetItemGem
 local GetTime = GetTime
 local GetWeaponEnchantInfo = GetWeaponEnchantInfo
 local GetTalentInfo = GetTalentInfo
-local GetNumGlyphs = GetNumGlyphs
-local GetNumSpecializations = GetNumSpecializations
+local GetNumTalentTabs = GetNumTalentTabs
 local GetNumTalents = GetNumTalents
-local GetGlyphSocketInfo = GetGlyphSocketInfo
 local GetCombatRatingBonus = GetCombatRatingBonus
 local GetShapeshiftFormInfo = GetShapeshiftFormInfo
 local GetAttackPowerForStat = GetAttackPowerForStat
@@ -765,7 +763,6 @@ function DrDamage:Load()
 	self:LoadData()
 	--self:ZONE_CHANGED_NEW_AREA()
 	self:MetaGems()
-	self:UpdateGlyphs()
 	self:UpdateTalents()
 	playerCompatible = true
 
@@ -783,10 +780,6 @@ function DrDamage:Load()
 	end
 
 	self:RegisterEvent("CHARACTER_POINTS_CHANGED","UPDATE_TALENTS")
-	self:RegisterEvent("ACTIVE_TALENT_GROUP_CHANGED","UPDATE_TALENTS")
-	self:RegisterEvent("GLYPH_ADDED", "UpdateGlyphs")
-	self:RegisterEvent("GLYPH_UPDATED", "UpdateGlyphs")
-	self:RegisterEvent("GLYPH_REMOVED", "UpdateGlyphs")
 	self:RegisterEvent("PLAYER_LEVEL_UP")
 	self:RegisterBucketEvent("PLAYER_EQUIPMENT_CHANGED", 0.3)
 	--self:RegisterEvent("ZONE_CHANGED_NEW_AREA")
@@ -920,7 +913,8 @@ function DrDamage:GeneralOptions()
 				args = {
 					AddonTitle = {
 						type = 'header',
-						name = "DrDamage " .. GetAddOnMetadata("DrDamage", "version"),
+						--name = "DrDamage " .. GetAddOnMetadata("DrDamage", "version"),
+						name = "DrDamage 1.0.0",
 						order = 0,
 					},
 					DisplayTypeText = {
@@ -2205,7 +2199,7 @@ function DrDamage:GeneralOptions()
 		end
 	end
 	local talentTable = optionsTable.Talents.args
-	for t = 1, GetNumSpecializations() do
+	for t = 1, GetNumTalentTabs() do
 		for i = 1, GetNumTalents(t) do
 			local talentName, icon, _, _, _, maxRank = GetTalentInfo(t, i)
 			if talentInfo[talentName] and not talentInfo[talentName].NoManual then
@@ -2229,11 +2223,14 @@ function DrDamage:GeneralOptions()
 				}
 			end
 		end
+		--[[
 		talentTable[("Tab" .. t)] = {
 			type = 'header',
-			name = --[["|T" .. select(2,GetSpecializationInfo(t)) .. ":30:30:-7:0|t" ..--]] select(2,GetSpecializationInfo(t)),
+			--name =  select(2,GetSpecializationInfo(t)),
+			name = select(2,GetSpecializationInfo(t)),
 			order = 2 + (t-1) * 49,
 		}
+		]]
 	end
 	AC:RegisterOptionsTable("DrDamage-Main", {
 		type = 'group',
@@ -2665,7 +2662,7 @@ function DrDamage:UpdateTalents(manual, all)
 	TalentTimer = nil
 	if not manual and not self.CustomTalents then
 		DrD_ClearTable( talents )
-		for t = 1, GetNumSpecializations() do
+		for t = 1, GetNumTalentTabs() do
 			for i = 1, GetNumTalents(t) do
 				local talentName, _, _, _, currRank, maxRank = GetTalentInfo(t, i)
 				if talentInfo[talentName] then
@@ -2763,27 +2760,6 @@ function DrDamage:GetSetAmount(set)
 	end
 	SetItems[set] = amount
 	return amount
-end
-
-local Glyphs = {}
-function DrDamage:HasGlyph(glyph)
-	--@debug@
-	if self.debug then
-		return true
-	end
-	--@end-debug@
-	return Glyphs[glyph]
-end
-
-function DrDamage:UpdateGlyphs(event)
-	DrD_ClearTable(Glyphs)
-	for i=1,GetNumGlyphs() do
-		local _, _, _, id = GetGlyphSocketInfo(i)
-		if id then Glyphs[id] = true end
-	end
-	if event then
-		self:ScheduleUpdate(2)
-	end
 end
 
 local lines = {}

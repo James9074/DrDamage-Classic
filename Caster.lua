@@ -48,10 +48,8 @@ local GetCombatRatingBonus = GetCombatRatingBonus
 local GetRangedCritChance = GetRangedCritChance
 local GetManaRegen = GetManaRegen
 local GetUnitManaRegenRateFromSpirit = GetUnitManaRegenRateFromSpirit
-local GetMastery = GetMastery
 local GetSpellHitModifier = GetSpellHitModifier
 local GetAttackPowerForStat = GetAttackPowerForStat
-local GetSpecialization = GetSpecialization
 local HasWandEquipped = HasWandEquipped
 local IsShiftKeyDown = IsShiftKeyDown
 
@@ -117,7 +115,6 @@ function DrDamage:Caster_CheckBaseStats()
 	--Spell hit rating
 	+ GetCombatRating(8)
 	+ GetManaRegen("player")
-	+ GetMasteryEffect()
 	--Cast time
 	+ select(7,GetSpellInfo(18960))
 	--Spell haste rating
@@ -261,11 +258,6 @@ function DrDamage:CasterCalc( name, rank, tooltip, modify, debug )
 	calculation.leechBonus = baseSpell.Leech or 0							--Leech amount
 	calculation.hybridCanCrit = true
 	--calculation.noDotHaste = baseSpell.NoDotHaste
-	calculation.mastery, calculation.masteryM = GetMasteryEffect()
-	calculation.spec = GetSpecialization()
-	--@debug@
-	calculation.spec = debug or GetSpecialization()
-	--@end-debug@
 	--Calculation variables
 	calculation.bDmgM = 1													--Base multiplier
 	calculation.dmgM = 1													--Final multiplier
@@ -406,7 +398,6 @@ function DrDamage:CasterCalc( name, rank, tooltip, modify, debug )
 			calculation.hasteRating = calculation.hasteRating - GetCombatRating(20)
 			calculation.critPerc = calculation.critPerc - GetCombatRatingBonus((baseSpell.MeleeCrit and 9 or 11))
 			calculation.hitPerc = calculation.hitPerc - GetCombatRatingBonus((baseSpell.MeleeHit and 6 or 8))
-			calculation.mastery = GetMasteryEffect() - calculation.masteryM * GetCombatRatingBonus(26)
 			--Nether attunement
 			if IsSpellKnown(117957) then
 				calculation.combatRegen = calculation.combatRegen / (1 + 0.01 * GetCombatRatingBonus(20)) * (1 + 0.01 * math_max(0,self:GetRating("Haste", settings.HasteRating, true)))
@@ -422,7 +413,6 @@ function DrDamage:CasterCalc( name, rank, tooltip, modify, debug )
 		calculation.meleeHit = calculation.spellHit
 		calculation.spellCrit = self:GetRating("Crit", settings.CritRating, true)
 		calculation.meleeCrit = calculation.meleeCrit
-		calculation.mastery = math_max(0, calculation.mastery + calculation.masteryM * self:GetRating("Mastery", settings.MasteryRating, true))
 	end
 
 	--CORE: Add mana potions if not potion sickness
@@ -551,12 +541,6 @@ function DrDamage:CasterCalc( name, rank, tooltip, modify, debug )
 		end
 	end
 
-	--CORE: Mastery only available above level 80
-	calculation.mastery = (playerLevel >= 80) and calculation.mastery or 0
-	--@debug@
-	calculation.mastery = debug and 8 or (playerLevel >= 80) and calculation.mastery or 0
-	--@end-debug@
-	
 	--CORE: Calculate crit depression
 	if settings.TargetLevel > 0 or not UnitIsPlayer("target") then
 		if settings.CritDepression then -- and baseSpell.MeleeCrit then
@@ -607,7 +591,7 @@ function DrDamage:CasterCalc( name, rank, tooltip, modify, debug )
 	local avgTotal = DrD_DmgCalc( baseSpell, spell, false, false, tooltip )
 
 	if tooltip and not baseSpell.NoNext then
-		if settings.Next or settings.CompareStats or settings.CompareStr or settings.CompareAgi or settings.CompareInt or settings.CompareAP or settings.CompareMastery or settings.CompareCrit or settings.CompareHit or settings.CompareHaste then
+		if settings.Next or settings.CompareStats or settings.CompareStr or settings.CompareAgi or settings.CompareInt or settings.CompareAP or settings.CompareCrit or settings.CompareHit or settings.CompareHaste then
 			local avgTotal = DrD_DmgCalc( baseSpell, spell, true )
 			CalculationResults.Stats = avgTotal
 			if calculation.canCrit then
@@ -634,12 +618,6 @@ function DrDamage:CasterCalc( name, rank, tooltip, modify, debug )
 				calculation.agi = calculation.agi + 10
 				CalculationResults.NextAgi = DrD_DmgCalc( baseSpell, spell, true ) - avgTotal
 				calculation.agi = calculation.agi - 10
-			end
-			if calculation.playerLevel >= 80 then
-				calculation.mastery = calculation.mastery + 1
-				CalculationResults.NextMastery = DrD_DmgCalc( baseSpell, spell, true ) - avgTotal
-				CalculationResults.MasteryM = calculation.masteryM
-				calculation.mastery = calculation.mastery - 1
 			end
 			if not healingSpell and not baseSpell.Unresistable then
 				local temp = settings.HitCalc and avgTotal or DrD_DmgCalc( baseSpell, spell, true, true )
@@ -1343,7 +1321,6 @@ function DrDamage:CasterTooltip( frame, name, rank )
 		local agiA = CalculationResults.NextAgi and (CalculationResults.NextAgi > 0) and CalculationResults.Stats * 0.1 / CalculationResults.NextAgi
 		local intA = CalculationResults.NextInt and (CalculationResults.NextInt > 0) and CalculationResults.Stats * 0.1 / CalculationResults.NextInt
 		local apA = CalculationResults.NextAP and (CalculationResults.NextAP > 0) and CalculationResults.Stats * 0.1 / CalculationResults.NextAP
-		local masA = CalculationResults.NextMastery and (CalculationResults.NextMastery > 0) and CalculationResults.Stats * 0.01 / CalculationResults.NextMastery * self:GetRating("Mastery", nil, true ) * (1 / CalculationResults.MasteryM)
 		local critA = CalculationResults.NextCrit and (CalculationResults.NextCrit > 0) and CalculationResults.Stats * 0.01 / CalculationResults.NextCrit * self:GetRating("Crit", nil, true )
 		local hasA = CalculationResults.Haste and (self:GetRating("Haste",nil,true) + 0.01 * CalculationResults.Haste)
 		local hitA = CalculationResults.NextHit and (CalculationResults.NextHit > 0.0) and CalculationResults.Stats * 0.01 / CalculationResults.NextHit * self:GetRating("Hit", nil, true)
@@ -1353,7 +1330,6 @@ function DrDamage:CasterTooltip( frame, name, rank )
 			if agiA then frame:AddDoubleLine("+10 " .. L["Agi"] .. ":", "+" .. DrD_Round(CalculationResults.NextAgi, 2), rt, gt, bt, r, g, b) end
 			if intA then frame:AddDoubleLine("+10 " .. L["Int"] .. ":", "+" .. DrD_Round(CalculationResults.NextInt, 2), rt, gt, bt, r, g, b ) end
 			if apA then frame:AddDoubleLine("+10 " .. L["AP"] .. ":", "+" .. DrD_Round(CalculationResults.NextAP, 2), rt, gt, bt, r, g, b ) end
-			if masA then frame:AddDoubleLine("+1 " .. L["Mastery"] .. " (" .. DrD_Round(self:GetRating("Mastery", nil, true) * (1 / CalculationResults.MasteryM),2) .. "):", "+" .. DrD_Round(CalculationResults.NextMastery, 2), rt, gt, bt, r, g, b ) end
 			if critA then frame:AddDoubleLine("+1% " .. L["Crit"] .. " (" .. self:GetRating("Crit") .. "):", "+" .. DrD_Round(CalculationResults.NextCrit, 2), rt, gt, bt, r, g, b ) end
 			if hitA then frame:AddDoubleLine("+1% " .. L["Hit"] .. " (" .. self:GetRating("Hit") .. "):", "+" .. DrD_Round(CalculationResults.NextHit, 2), rt, gt, bt, r, g, b ) end
 		end
@@ -1420,10 +1396,6 @@ function DrDamage:CasterTooltip( frame, name, rank )
 		end
 		if settings.CompareAP and apA then
 			local text, value = self:CompareTooltip(apA, strA, agiA, intA, masA, critA, hitA, hasA, L["AP"], L["Str"], L["Agi"], L["Int"], L["Ma"], L["Cr"], L["Ht"], L["Ha"])
-			if text then frame:AddDoubleLine(text, value, rt, gt, bt, r, g, b ) end
-		end
-		if settings.CompareMastery and masA then
-			local text, value = self:CompareTooltip(masA, strA, agiA, intA, apA, critA, hitA, hasA, L["Ma"], L["Str"], L["Agi"], L["Int"], L["AP"], L["Cr"], L["Ht"], L["Ha"])
 			if text then frame:AddDoubleLine(text, value, rt, gt, bt, r, g, b ) end
 		end
 		if settings.CompareCrit and critA then

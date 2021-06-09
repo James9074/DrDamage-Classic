@@ -1,0 +1,43 @@
+package-as: DrDamage
+
+externals:
+ #libs/LibStub:
+ # url: svn://svn.wowace.com/wow/libstub/mainline/tags/1.0
+ libs/CallbackHandler-1.0:
+  url: svn://svn.wowace.com/wow/callbackhandler/mainline/trunk/CallbackHandler-1.0
+ libs/AceAddon-3.0:
+  url: svn://svn.wowace.com/wow/ace3/mainline/trunk/AceAddon-3.0
+ libs/AceBucket-3.0:
+  url: svn://svn.wowace.com/wow/ace3/mainline/trunk/AceBucket-3.0 
+ #libs/AceConfig-3.0:
+ # url: svn://svn.wowace.com/wow/ace3/mainline/trunk/AceConfig-3.0
+ libs/AceConsole-3.0:
+  url: svn://svn.wowace.com/wow/ace3/mainline/trunk/AceConsole-3.0
+ libs/AceDB-3.0:
+  url: svn://svn.wowace.com/wow/ace3/mainline/trunk/AceDB-3.0
+ libs/AceEvent-3.0:
+  url: svn://svn.wowace.com/wow/ace3/mainline/trunk/AceEvent-3.0
+ #libs/AceGUI-3.0:
+ # url: svn://svn.wowace.com/wow/ace3/mainline/trunk/AceGUI-3.0
+ libs/AceGUI-3.0-SharedMediaWidgets:
+  url: svn://svn.wowace.com/wow/ace-gui-3-0-shared-media-widgets/mainline/trunk/AceGUI-3.0-SharedMediaWidgets
+ libs/AceHook-3.0:
+  url: svn://svn.wowace.com/wow/ace3/mainline/trunk/AceHook-3.0  
+ libs/AceLocale-3.0:
+  url: svn://svn.wowace.com/wow/ace3/mainline/trunk/AceLocale-3.0
+ libs/AceTimer-3.0:
+  url: svn://svn.wowace.com/wow/ace3/mainline/trunk/AceTimer-3.0
+ libs/LibGratuity-3.0:
+  url: svn://svn.wowace.com/wow/libgratuity-3-0/mainline/trunk
+ libs/LibSharedMedia-3.0:
+  url: svn://svn.wowace.com/wow/libsharedmedia-3-0/mainline/trunk/LibSharedMedia-3.0
+  
+ignore:
+  - Debug.lua
+  - docs
+
+tools-used:
+  - libdatabroker-1-1
+  - libstub
+  - acegui-3-0
+  - aceconfig-3-0
